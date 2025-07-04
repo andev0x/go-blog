@@ -26,6 +26,10 @@ func main() {
 	r := gin.Default()
 	r.Use(middleware.Recaptcha())
 
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "Welcome to the Go Blog API"})
+	})
+
 	api := r.Group("/api/v1")
 	commentHandler.RegisterRoutes(api)
 	r.Run(":" + cfg.Port)
