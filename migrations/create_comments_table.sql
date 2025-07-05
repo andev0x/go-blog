@@ -2,6 +2,6 @@ CREATE TABLE IF NOT EXISTS comments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     post_id INTEGER NOT NULL,
     name TEXT NOT NULL,
-    email TEXT NOT NULL,
-    content TEXT NOT NULL
+    content TEXT NOT NULL,
+    rating INTEGER NOT NULL
 );

@@ -26,9 +26,24 @@ func (h *CommentHandler) RegisterRoutes(rg *gin.RouterGroup) {
 func (h *CommentHandler) Create(c *gin.Context) {
 	var comment model.Comment
 	if err := c.ShouldBindJSON(&comment); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON format: " + err.Error()})
 		return
 	}
+
+	// Validate required fields
+	if comment.Name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Name is required"})
+		return
+	}
+	if comment.Content == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Content is required"})
+		return
+	}
+	if comment.Rating < 1 || comment.Rating > 5 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Rating must be between 1 and 5"})
+		return
+	}
+
 	if err := h.service.AddComment(&comment); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
