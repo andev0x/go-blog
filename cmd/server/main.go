@@ -23,9 +23,29 @@ func main() {
 
 	// Auto-migrate database tables
 	if err := db.AutoMigrate(&model.Comment{}); err != nil {
-		log.Fatalf("Failed to migrate database: %v", err)
+		log.Printf("Warning: Auto-migration failed: %v", err)
+		log.Println("Attempting to create table manually...")
+
+		// Try to create the table manually with proper PostgreSQL syntax
+		sql := `
+		CREATE TABLE IF NOT EXISTS comments (
+			id SERIAL PRIMARY KEY,
+			post_id INTEGER NOT NULL,
+			name TEXT NOT NULL,
+			content TEXT NOT NULL,
+			rating INTEGER NOT NULL,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		);`
+
+		if err := db.Exec(sql).Error; err != nil {
+			log.Printf("Manual table creation failed: %v", err)
+			log.Fatalf("Database setup failed. Please check your database configuration.")
+		} else {
+			log.Println("Table created manually successfully")
+		}
+	} else {
+		log.Println("Database migration completed successfully")
 	}
-	log.Println("Database migration completed successfully")
 
 	commentRepo := repository.NewCommentRepository(db)
 	commentService := service.NewCommentService(commentRepo)
