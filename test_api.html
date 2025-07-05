@@ -10,6 +10,8 @@
     <button onclick="testRoot()">Test Root (/)</button>
     <button onclick="testComments()">Test Comments GET</button>
     <button onclick="testCreateComment()">Test Create Comment</button>
+    <button onclick="testPostComments()">Test Post Comments</button>
+    <button onclick="testPostRatings()">Test Post Ratings</button>
     
     <div id="results"></div>
 
@@ -57,6 +59,26 @@
                 log('✅ Create comment: ' + JSON.stringify(data));
             } catch (error) {
                 log('❌ Create comment error: ' + error.message);
+            }
+        }
+        
+        async function testPostComments() {
+            try {
+                const response = await fetch(API_BASE + '/api/v1/posts/setup-ssh-guide/comments');
+                const data = await response.json();
+                log('✅ Post comments: ' + JSON.stringify(data));
+            } catch (error) {
+                log('❌ Post comments error: ' + error.message);
+            }
+        }
+        
+        async function testPostRatings() {
+            try {
+                const response = await fetch(API_BASE + '/api/v1/posts/setup-ssh-guide/ratings');
+                const data = await response.json();
+                log('✅ Post ratings: ' + JSON.stringify(data));
+            } catch (error) {
+                log('❌ Post ratings error: ' + error.message);
             }
         }
     </script>

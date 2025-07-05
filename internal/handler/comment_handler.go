@@ -22,6 +22,11 @@ func (h *CommentHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	r.GET("/", h.ListAll)
 	r.POST("/", h.Create)
 	r.GET("/post/:id", h.ListByPost)
+
+	// Add post-specific routes that frontend expects
+	posts := rg.Group("/posts")
+	posts.GET("/:slug/comments", h.ListBySlug)
+	posts.GET("/:slug/ratings", h.GetRatingsBySlug)
 }
 
 func (h *CommentHandler) ListAll(c *gin.Context) {
@@ -70,4 +75,22 @@ func (h *CommentHandler) ListByPost(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, comments)
+}
+
+// New endpoint for frontend: /posts/:slug/comments
+func (h *CommentHandler) ListBySlug(c *gin.Context) {
+	// For now, return empty array. You can implement slug-based logic later
+	comments := []model.Comment{}
+	c.JSON(http.StatusOK, comments)
+}
+
+// New endpoint for frontend: /posts/:slug/ratings
+func (h *CommentHandler) GetRatingsBySlug(c *gin.Context) {
+	// For now, return empty ratings. You can implement rating aggregation later
+	ratings := gin.H{
+		"average": 0,
+		"count":   0,
+		"ratings": []int{},
+	}
+	c.JSON(http.StatusOK, ratings)
 }
