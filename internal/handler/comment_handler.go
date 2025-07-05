@@ -19,8 +19,15 @@ func NewCommentHandler(s service.CommentService) *CommentHandler {
 
 func (h *CommentHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	r := rg.Group("/comments")
+	r.GET("/", h.ListAll)
 	r.POST("/", h.Create)
 	r.GET("/post/:id", h.ListByPost)
+}
+
+func (h *CommentHandler) ListAll(c *gin.Context) {
+	// Simple endpoint to list all comments
+	comments := []model.Comment{} // For now, return empty array
+	c.JSON(http.StatusOK, comments)
 }
 
 func (h *CommentHandler) Create(c *gin.Context) {

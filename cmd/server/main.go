@@ -26,8 +26,9 @@ func main() {
 
 	r := gin.Default()
 
+	// CORS configuration - more permissive for testing
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://andev0x.github.io"},
+		AllowOrigins:     []string{"https://andev0x.github.io", "http://localhost:3000", "*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -40,7 +41,14 @@ func main() {
 		c.JSON(200, gin.H{"message": "Welcome to the Go Blog API"})
 	})
 
+	// Test endpoint to verify routing
+	r.GET("/test", func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "Test endpoint working"})
+	})
+
 	api := r.Group("/api/v1")
 	commentHandler.RegisterRoutes(api)
+
+	log.Printf("Server starting on port %s", cfg.Port)
 	r.Run(":" + cfg.Port)
 }

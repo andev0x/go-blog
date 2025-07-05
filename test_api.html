@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>Go Blog API Test</h1>
+    
+    <h2>Test Endpoints</h2>
+    <button onclick="testRoot()">Test Root (/)</button>
+    <button onclick="testComments()">Test Comments GET</button>
+    <button onclick="testCreateComment()">Test Create Comment</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = "https://go-blog-production-e388.up.railway.app";
+        
+        function log(message) {
+            document.getElementById('results').innerHTML += '<p>' + message + '</p>';
+        }
+        
+        async function testRoot() {
+            try {
+                const response = await fetch(API_BASE + '/');
+                const data = await response.json();
+                log('✅ Root endpoint: ' + JSON.stringify(data));
+            } catch (error) {
+                log('❌ Root endpoint error: ' + error.message);
+            }
+        }
+        
+        async function testComments() {
+            try {
+                const response = await fetch(API_BASE + '/api/v1/comments');
+                const data = await response.json();
+                log('✅ Comments GET: ' + JSON.stringify(data));
+            } catch (error) {
+                log('❌ Comments GET error: ' + error.message);
+            }
+        }
+        
+        async function testCreateComment() {
+            try {
+                const response = await fetch(API_BASE + '/api/v1/comments', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: 'Test User',
+                        content: 'Test comment from frontend',
+                        rating: 5
+                    })
+                });
+                const data = await response.json();
+                log('✅ Create comment: ' + JSON.stringify(data));
+            } catch (error) {
+                log('❌ Create comment error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html> 
