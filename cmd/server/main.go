@@ -4,6 +4,7 @@ import (
 	"go-blog/config"
 	"go-blog/internal/handler"
 	"go-blog/internal/middleware"
+	"go-blog/internal/model"
 	"go-blog/internal/repository"
 	"go-blog/internal/service"
 	"log"
@@ -20,6 +21,12 @@ func main() {
 	cfg := config.Load()
 	db := config.ConnectDB(cfg)
 
+	// Auto-migrate database tables
+	if err := db.AutoMigrate(&model.Comment{}); err != nil {
+		log.Fatalf("Failed to migrate database: %v", err)
+	}
+	log.Println("Database migration completed successfully")
+
 	commentRepo := repository.NewCommentRepository(db)
 	commentService := service.NewCommentService(commentRepo)
 	commentHandler := handler.NewCommentHandler(commentService)
@@ -28,7 +35,7 @@ func main() {
 
 	// CORS configuration - more permissive for testing
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://andev0x.github.io", "http://localhost:3000", "*"},
+		AllowOrigins:     []string{"https://andev0x.github.io", "http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
