@@ -10,11 +10,12 @@ import (
 )
 
 type CommentHandler struct {
-	service service.CommentService
+	service     service.CommentService
+	postService *service.PostService
 }
 
-func NewCommentHandler(s service.CommentService) *CommentHandler {
-	return &CommentHandler{s}
+func NewCommentHandler(s service.CommentService, ps *service.PostService) *CommentHandler {
+	return &CommentHandler{s, ps}
 }
 
 func (h *CommentHandler) RegisterRoutes(rg *gin.RouterGroup) {
@@ -143,7 +144,7 @@ func (h *CommentHandler) GetRatingsBySlug(c *gin.Context) {
 
 // New endpoint for frontend: /posts/:slug/ratings (POST)
 func (h *CommentHandler) CreateRatingBySlug(c *gin.Context) {
-	_ = c.Param("slug") // TODO: implement slug-based logic
+	slug := c.Param("slug")
 
 	var ratingData struct {
 		Value int `json:"value"`
@@ -154,17 +155,21 @@ func (h *CommentHandler) CreateRatingBySlug(c *gin.Context) {
 		return
 	}
 
-	// Validate rating value
 	if ratingData.Value < 1 || ratingData.Value > 5 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Rating must be between 1 and 5"})
 		return
 	}
 
-	// Create rating (for now, using slug as post_id)
+	postID, err := h.postService.GetPostIDBySlug(slug)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post slug"})
+		return
+	}
+
 	comment := model.Comment{
 		Name:    "Anonymous",
 		Content: "Rating",
-		PostID:  1, // Placeholder - you'll need to map slug to post_id
+		PostID:  postID,
 		Rating:  ratingData.Value,
 	}
 
@@ -173,7 +178,6 @@ func (h *CommentHandler) CreateRatingBySlug(c *gin.Context) {
 		return
 	}
 
-	// Return in frontend expected format
 	response := gin.H{
 		"id":        comment.ID,
 		"value":     comment.Rating,

@@ -22,7 +22,7 @@ func main() {
 	db := config.ConnectDB(cfg)
 
 	// Auto-migrate database tables
-	if err := db.AutoMigrate(&model.Comment{}); err != nil {
+	if err := db.AutoMigrate(&model.Comment{}, &model.Post{}); err != nil {
 		log.Printf("Warning: Auto-migration failed: %v", err)
 		log.Println("Attempting to create table manually...")
 
@@ -48,8 +48,10 @@ func main() {
 	}
 
 	commentRepo := repository.NewCommentRepository(db)
+	postRepo := repository.NewPostRepository(db)
+	postService := service.NewPostService(postRepo)
 	commentService := service.NewCommentService(commentRepo)
-	commentHandler := handler.NewCommentHandler(commentService)
+	commentHandler := handler.NewCommentHandler(commentService, postService)
 
 	r := gin.Default()
 
